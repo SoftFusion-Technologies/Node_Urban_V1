@@ -11,6 +11,7 @@ import dotenv from 'dotenv';
 
 import { login, authenticateToken } from './Security/auth.js'; // Importa las funciones del archivo auth.js
 import { PORT } from './DataBase/config.js';
+import mysql from 'mysql2/promise'; // Usar mysql2 para las promesas
 
 // CONFIGURACION PRODUCCION
 if (process.env.NODE_ENV !== 'production') {
@@ -37,6 +38,13 @@ try {
   console.log(`El error de la conexion es : ${error}`);
 }
 
+const pool = mysql.createPool({
+  host: 'localhost', // Configurar según tu base de datos
+  user: 'root', // Configurar según tu base de datos
+  password: '123456', // Configurar según tu base de datos
+  database: 'DB_UrbanDESA_23052025'
+});
+
 // Ruta de login
 app.post('/login', login);
 
@@ -56,6 +64,30 @@ app.get('/', (req, res) => {
   }
 });
 
+/*
+ * MODULO ESTADISTICAS
+ */
+// Endpoint que devuelve el total de alumnos por profesor
+// GET /estadisticas/alumnos-por-profesor
+app.get('/estadisticas/alumnos-por-profesor', async (req, res) => {
+  try {
+    const [result] = await pool.query(
+      `SELECT 
+         u.id AS profesor_id,
+         u.name AS profesor_nombre,
+         COUNT(s.id) AS total_alumnos
+       FROM students s
+       INNER JOIN users u ON s.user_id = u.id
+       GROUP BY u.id, u.name
+       ORDER BY total_alumnos DESC`
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error al obtener alumnos por profesor:', error);
+    res.status(500).json({ error: 'Error al obtener alumnos por profesor' });
+  }
+});
 
 if (!PORT) {
   console.error('El puerto no está definido en el archivo de configuración.');
