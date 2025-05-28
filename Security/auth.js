@@ -70,7 +70,8 @@ export const loginAlumno = async (req, res) => {
       return res.json({
         message: 'Success',
         token,
-        nomyape: students.nomyape
+        nomyape: students.nomyape,
+        id: students.id
       });
     } else {
       return res.json('Fail');
