@@ -44,3 +44,51 @@ export const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
+export const loginAlumno = async (req, res) => {
+  const { telefono, dni } = req.body;
+
+  const sql = `
+    SELECT * FROM students
+    WHERE telefono = :telefono AND dni = :dni
+  `;
+
+  try {
+    const [results] = await db.query(sql, {
+      replacements: { telefono, dni }
+    });
+
+    if (results.length > 0) {
+      const student = results[0];
+      const token = jwt.sign(
+        { id: student.id, role: 'student', nomyape: student.nomyape },
+        'softfusion',
+        { expiresIn: '1h' }
+      );
+
+      return res.json({
+        message: 'Success',
+        token,
+        name: student.nomyape
+      });
+    } else {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+export const authenticateStudent = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, 'softfusion', (err, student) => {
+    if (err) return res.sendStatus(403);
+    req.student = student;
+    next();
+  });
+};
