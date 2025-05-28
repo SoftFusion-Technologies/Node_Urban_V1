@@ -59,20 +59,21 @@ export const loginAlumno = async (req, res) => {
     });
 
     if (results.length > 0) {
-      const student = results[0];
+      const students = results[0];
       const token = jwt.sign(
-        { id: student.id, role: 'student', nomyape: student.nomyape },
+        { id: students.id, nomyape: students.nomyape },
         'softfusion',
-        { expiresIn: '1h' }
+        {
+          expiresIn: '1h'
+        }
       );
-
       return res.json({
         message: 'Success',
         token,
-        name: student.nomyape
+        nomyape: students.nomyape
       });
     } else {
-      return res.status(401).json({ message: 'Credenciales inválidas' });
+      return res.json('Fail');
     }
   } catch (err) {
     console.error(err);

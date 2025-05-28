@@ -62,7 +62,7 @@ app.get('/protected', authenticateToken, (req, res) => {
 app.post('/loginAlumno', loginAlumno);
 
 // ✅ Ruta protegida (requiere token)
-app.get('/protected', authenticateStudent, (req, res) => {
+app.get('/protected', authenticateToken, (req, res) => {
   res.json({ message: 'Esto es una ruta protegida', user: req.user });
 });
 
