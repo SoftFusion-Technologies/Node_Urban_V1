@@ -42,8 +42,25 @@ export const OBR_RoutineExercises_CTS = async (req, res) => {
 // Crear un nuevo ejercicio
 export const CR_RoutineExercises_CTS = async (req, res) => {
   try {
-    const nuevoEjercicio = await RoutineExercisesModel.create(req.body);
-    res.json({ message: 'Ejercicio creado correctamente', nuevoEjercicio });
+    const ejercicios = req.body;
+
+    if (Array.isArray(ejercicios)) {
+      // Crear varios ejercicios con bulkCreate
+      const nuevosEjercicios = await RoutineExercisesModel.bulkCreate(
+        ejercicios
+      );
+      return res.json({
+        message: 'Ejercicios creados correctamente',
+        nuevosEjercicios
+      });
+    } else {
+      // Crear un solo ejercicio
+      const nuevoEjercicio = await RoutineExercisesModel.create(ejercicios);
+      return res.json({
+        message: 'Ejercicio creado correctamente',
+        nuevoEjercicio
+      });
+    }
   } catch (error) {
     res.status(500).json({ mensajeError: error.message });
   }

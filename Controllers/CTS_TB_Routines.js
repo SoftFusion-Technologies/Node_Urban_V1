@@ -35,13 +35,15 @@ export const OBR_Routines_CTS = async (req, res) => {
   }
 };
 
-// Crear un nuevo registro en routines
 export const CR_Routines_CTS = async (req, res) => {
   try {
     const registro = await RoutinesModel.create(req.body);
-    res.json({ message: 'Rutina creada correctamente' });
+    res.json({
+      message: 'Rutina creada correctamente',
+      id: registro.id   
+    });
   } catch (error) {
-    res.json({ mensajeError: error.message });
+    res.status(500).json({ mensajeError: error.message });
   }
 };
 
