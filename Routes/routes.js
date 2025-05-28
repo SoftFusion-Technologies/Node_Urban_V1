@@ -71,6 +71,14 @@ import {
   MIGRAR_AlumnoPendiente_CTS
 } from '../Controllers/CTS_TB_StudentsPendientes.js';
 
+import {
+  OBR_Leads_CTS,
+  OBRS_Leads_CTS,
+  CR_Leads_CTS,
+  ER_Leads_CTS,
+  UR_Leads_CTS
+} from '../Controllers/CTS_TB_Leads.js';
+
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -204,5 +212,19 @@ router.put('/students-pendientes/:id', UR_StudentsPendientes_CTS);
 router.post('/students-pendientes/migrar/:id', MIGRAR_AlumnoPendiente_CTS);
 // ----------------------------------------------------------------
 
+// Obtener todos los leads o aplicar filtros si los tuviera
+router.get('/leads', OBRS_Leads_CTS);
+
+// Obtener un lead específico por su ID
+router.get('/leads/:id', OBR_Leads_CTS);
+
+// Crear un nuevo lead
+router.post('/leads', CR_Leads_CTS);
+
+// Eliminar un lead por su ID
+router.delete('/leads/:id', ER_Leads_CTS);
+
+// Actualizar un lead por su ID
+router.put('/leads/:id', UR_Leads_CTS);
 // Exporta el enrutador
 export default router;
