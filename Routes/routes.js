@@ -62,6 +62,15 @@ import {
   UR_RoutineRequest_CTS
 } from '../Controllers/CTS_TB_RoutineRequests.js';
 
+import {
+  OBR_StudentsPendientes_CTS,
+  OBRS_StudentsPendientes_CTS,
+  CR_StudentsPendientes_CTS,
+  ER_StudentsPendientes_CTS,
+  UR_StudentsPendientes_CTS,
+  MIGRAR_AlumnoPendiente_CTS
+} from '../Controllers/CTS_TB_StudentsPendientes.js';
+
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -174,6 +183,25 @@ router.delete('/routine_requests/:id', ER_RoutineRequest_CTS);
 
 // Actualizar una solicitud por ID
 router.put('/routine_requests/:id', UR_RoutineRequest_CTS);
+// ----------------------------------------------------------------
+
+// GET /api/students-pendientes           → Obtener todos o filtrar por user_id
+router.get('/students-pendientes', OBRS_StudentsPendientes_CTS);
+
+// GET /api/students-pendientes/:id       → Obtener alumno pendiente por ID
+router.get('/students-pendientes/:id', OBR_StudentsPendientes_CTS);
+
+// POST /api/students-pendientes          → Crear nuevo alumno pendiente
+router.post('/students-pendientes', CR_StudentsPendientes_CTS);
+
+// DELETE /api/students-pendientes/:id    → Eliminar alumno pendiente
+router.delete('/students-pendientes/:id', ER_StudentsPendientes_CTS);
+
+// PUT /api/students-pendientes/:id       → Actualizar alumno pendiente
+router.put('/students-pendientes/:id', UR_StudentsPendientes_CTS);
+
+// POST /api/students-pendientes/migrar/:id → Autorizar (migrar) alumno
+router.post('/students-pendientes/migrar/:id', MIGRAR_AlumnoPendiente_CTS);
 // ----------------------------------------------------------------
 
 // Exporta el enrutador
