@@ -102,6 +102,32 @@ app.get('/estadisticas/alumnos-por-profesor', async (req, res) => {
   }
 });
 
+// GET /estadisticas/rutinas-por-profesor?mes=5&anio=2025
+app.get('/estadisticas/rutinas-por-profesor', async (req, res) => {
+  try {
+    const { mes, anio } = req.query;
+
+    const [result] = await pool.query(
+      `SELECT 
+         u.id AS profesor_id,
+         u.name AS profesor_nombre,
+         COUNT(r.id) AS total_rutinas
+       FROM routines r
+       INNER JOIN students s ON r.student_id = s.id
+       INNER JOIN users u ON s.user_id = u.id
+       WHERE r.mes = ? AND r.anio = ?
+       GROUP BY u.id, u.name
+       ORDER BY total_rutinas DESC`,
+      [mes, anio]
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error al obtener rutinas por profesor:', error);
+    res.status(500).json({ error: 'Error al obtener rutinas por profesor' });
+  }
+});
+
 if (!PORT) {
   console.error('El puerto no está definido en el archivo de configuración.');
   process.exit(1);
