@@ -36,8 +36,7 @@ import {
   CR_Routines_CTS,
   ER_Routines_CTS,
   UR_Routines_CTS,
-  DL_RoutineExercisesByMuscle_CTS,
-  GET_RutinasConEjercicios
+  DL_RoutineExercisesByMuscle_CTS
 } from '../Controllers/CTS_TB_Routines.js';
 
 import {
@@ -144,7 +143,6 @@ router.delete('/routines/:id', ER_Routines_CTS);
 router.put('/routines/:id', UR_Routines_CTS);
 // eliminar rutinas y ejercici
 router.delete('/routines/:routineId/:musculo', DL_RoutineExercisesByMuscle_CTS);
-router.get('/rutinasporstudient', GET_RutinasConEjercicios);
 
 // ----------------------------------------------------------------
 

@@ -123,32 +123,3 @@ export const DL_RoutineExercisesByMuscle_CTS = async (req, res) => {
     return res.status(500).json({ mensajeError: error.message });
   }
 };
-
-// Obtener rutinas, opcionalmente filtrando por student_id
-// Controlador para traer rutinas con ejercicios filtrando por studentId
-export const GET_RutinasConEjercicios = async (req, res) => {
-  try {
-    const { studentId } = req.query;
-
-    if (!studentId) {
-      return res
-        .status(400)
-        .json({ mensajeError: 'Falta el parámetro studentId' });
-    }
-
-    const rutinas = await RoutinesModel.findAll({
-      where: { student_id: studentId },
-      include: [{ model: RoutineExercisesModel, as: 'exercises' }],
-      order: [['fecha', 'ASC']]
-    });
-
-    // Filtrar rutinas que tengan al menos un ejercicio
-    const rutinasConEjercicios = rutinas.filter(
-      (rutina) => rutina.exercises && rutina.exercises.length > 0
-    );
-
-    res.json(rutinasConEjercicios);
-  } catch (error) {
-    res.status(500).json({ mensajeError: error.message });
-  }
-};
