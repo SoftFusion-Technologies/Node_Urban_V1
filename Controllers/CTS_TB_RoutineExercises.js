@@ -66,17 +66,24 @@ export const CR_RoutineExercises_CTS = async (req, res) => {
   }
 };
 
-// Eliminar un ejercicio por ID
 export const ER_RoutineExercises_CTS = async (req, res) => {
   try {
+    const { routineId, exerciseId } = req.params;
+
     const filasEliminadas = await RoutineExercisesModel.destroy({
-      where: { id: req.params.id }
+      where: {
+        id: exerciseId,
+        routine_id: routineId
+      }
     });
+
     if (filasEliminadas === 0) {
       return res.status(404).json({ mensajeError: 'Ejercicio no encontrado' });
     }
+
     res.json({ message: 'Ejercicio eliminado correctamente' });
   } catch (error) {
+    console.error('Error al eliminar ejercicio:', error); // <-- Aquí imprime el error en consola
     res.status(500).json({ mensajeError: error.message });
   }
 };
@@ -84,24 +91,26 @@ export const ER_RoutineExercises_CTS = async (req, res) => {
 // Actualizar un ejercicio por ID
 export const UR_RoutineExercises_CTS = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { exerciseId } = req.params; // fijate que sea este, no "id"
+    const datosActualizar = req.body;
+
     const [numFilasActualizadas] = await RoutineExercisesModel.update(
-      req.body,
-      {
-        where: { id }
-      }
+      datosActualizar,
+      { where: { id: exerciseId } }
     );
 
     if (numFilasActualizadas === 1) {
-      const registroActualizado = await RoutineExercisesModel.findByPk(id);
-      res.json({
+      const ejercicioActualizado = await RoutineExercisesModel.findByPk(
+        exerciseId
+      );
+      return res.json({
         message: 'Ejercicio actualizado correctamente',
-        registroActualizado
+        ejercicioActualizado
       });
     } else {
-      res.status(404).json({ mensajeError: 'Ejercicio no encontrado' });
+      return res.status(404).json({ mensajeError: 'Ejercicio no encontrado' });
     }
   } catch (error) {
-    res.status(500).json({ mensajeError: error.message });
+    return res.status(500).json({ mensajeError: error.message });
   }
 };

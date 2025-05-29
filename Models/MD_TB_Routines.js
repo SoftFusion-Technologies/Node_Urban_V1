@@ -13,7 +13,7 @@
 import dotenv from 'dotenv';
 import db from '../DataBase/db.js';
 import { DataTypes } from 'sequelize';
-
+import RoutineExercisesModel from './MD_TB_RoutineExercises.js';
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
@@ -50,5 +50,15 @@ const RoutinesModel = db.define(
     timestamps: false
   }
 );
+
+RoutinesModel.hasMany(RoutineExercisesModel, {
+  foreignKey: 'routine_id',
+  as: 'exercises' // alias para incluir ejercicios en la consulta
+});
+
+RoutineExercisesModel.belongsTo(RoutinesModel, {
+  foreignKey: 'routine_id',
+  as: 'routine'
+});
 
 export default RoutinesModel;

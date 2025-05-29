@@ -11,17 +11,33 @@
 
 // Importa el modelo necesario
 import RoutinesModel from '../Models/MD_TB_Routines.js';
+import RoutineExercisesModel from '../Models/MD_TB_RoutineExercises.js';
 
 // Mostrar todos los registros de routines o filtrar por student_id
+// Mostrar todos los registros de routines o filtrar por student_id, incluyendo ejercicios anidados
 export const OBRS_Routines_CTS = async (req, res) => {
   try {
     const { student_id } = req.query;
     const whereClause = student_id ? { student_id } : {};
-    const registros = await RoutinesModel.findAll({ where: whereClause });
+
+    const registros = await RoutinesModel.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: RoutineExercisesModel,
+          as: 'exercises' // El alias que definiste en la asociación, ajustar si es distinto
+          // Puedes incluir atributos específicos o filtrado si quieres
+          // attributes: ['id', 'name', 'sets', 'reps']
+        }
+      ]
+    });
+
     res.json(registros);
   } catch (error) {
-    console.error('Error al obtener rutinas:', error);
-    res.status(500).json({ mensajeError: 'Error al obtener rutinas' });
+    console.error('Error al obtener rutinas con ejercicios:', error);
+    res
+      .status(500)
+      .json({ mensajeError: 'Error al obtener rutinas con ejercicios' });
   }
 };
 
@@ -40,7 +56,7 @@ export const CR_Routines_CTS = async (req, res) => {
     const registro = await RoutinesModel.create(req.body);
     res.json({
       message: 'Rutina creada correctamente',
-      id: registro.id   
+      id: registro.id
     });
   } catch (error) {
     res.status(500).json({ mensajeError: error.message });

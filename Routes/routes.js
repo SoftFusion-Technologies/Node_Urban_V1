@@ -130,7 +130,7 @@ router.put('/students/:id', UR_Students_CTS);
 router.get('/routines', OBRS_Routines_CTS);
 
 // Obtener una rutina por ID
-router.get('/routines/:id', OBR_Routines_CTS);
+router.get('/routines/:id', OBRS_Routines_CTS);
 
 // Crear una nueva rutina
 router.post('/routines', CR_Routines_CTS);
@@ -153,10 +153,16 @@ router.get('/routine_exercises/:id', OBR_RoutineExercises_CTS);
 router.post('/routine_exercises', CR_RoutineExercises_CTS);
 
 // Eliminar un ejercicio por id
-router.delete('/routine_exercises/:id', ER_RoutineExercises_CTS);
-
+router.delete(
+  '/routines/:routineId/routines_exercises/:exerciseId',
+  ER_RoutineExercises_CTS
+);
 // Actualizar un ejercicio por id
-router.put('/routine_exercises/:id', UR_RoutineExercises_CTS);
+router.put(
+  '/routines/:routineId/routines_exercises/:exerciseId',
+  UR_RoutineExercises_CTS
+);
+
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
