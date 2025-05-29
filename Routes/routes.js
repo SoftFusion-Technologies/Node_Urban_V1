@@ -35,7 +35,8 @@ import {
   OBRS_Routines_CTS,
   CR_Routines_CTS,
   ER_Routines_CTS,
-  UR_Routines_CTS
+  UR_Routines_CTS,
+  DL_RoutineExercisesByMuscle_CTS
 } from '../Controllers/CTS_TB_Routines.js';
 
 import {
@@ -140,6 +141,12 @@ router.delete('/routines/:id', ER_Routines_CTS);
 
 // Actualizar una rutina por ID
 router.put('/routines/:id', UR_Routines_CTS);
+// eliminar rutinas y ejercici
+router.delete(
+  '/routines/:routineId/:musculo',
+  DL_RoutineExercisesByMuscle_CTS
+);
+
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------

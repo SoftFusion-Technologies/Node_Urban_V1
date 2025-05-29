@@ -94,3 +94,32 @@ export const UR_Routines_CTS = async (req, res) => {
     res.status(500).json({ mensajeError: error.message });
   }
 };
+
+// Eliminar ejercicios de una rutina por músculo
+export const DL_RoutineExercisesByMuscle_CTS = async (req, res) => {
+  try {
+    const { routineId, musculo } = req.params;
+
+    const deleted = await RoutineExercisesModel.destroy({
+      where: {
+        routine_id: routineId,
+        musculo: musculo
+      }
+    });
+
+    if (deleted > 0) {
+      return res.json({
+        message: `Ejercicios del músculo "${musculo}" eliminados correctamente.`
+      });
+    } else {
+      return res
+        .status(404)
+        .json({
+          mensajeError:
+            'No se encontraron ejercicios con ese músculo en la rutina.'
+        });
+    }
+  } catch (error) {
+    return res.status(500).json({ mensajeError: error.message });
+  }
+};
