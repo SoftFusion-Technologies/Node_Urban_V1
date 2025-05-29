@@ -123,3 +123,32 @@ export const DL_RoutineExercisesByMuscle_CTS = async (req, res) => {
     return res.status(500).json({ mensajeError: error.message });
   }
 };
+
+// controllers
+export const DL_UpdateMuscleName_CTS = async (req, res) => {
+  try {
+    const { routineId, oldMuscle } = req.params;
+    const { newMuscle } = req.body;
+
+    const [updated] = await RoutineExercisesModel.update(
+      { musculo: newMuscle },
+      {
+        where: {
+          routine_id: routineId,
+          musculo: oldMuscle
+        }
+      }
+    );
+
+    if (updated > 0) {
+      return res.json({ message: 'Músculo actualizado correctamente.' });
+    } else {
+      return res.status(404).json({
+        mensajeError:
+          'No se encontraron ejercicios con ese músculo en la rutina.'
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ mensajeError: error.message });
+  }
+};
