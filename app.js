@@ -128,6 +128,27 @@ app.get('/estadisticas/rutinas-por-profesor', async (req, res) => {
   }
 });
 
+app.get('/estadisticas/ayudas-por-profesor', async (req, res) => {
+  try {
+    const query = `
+      SELECT
+        u.id AS profesor_id,
+        u.name AS profesor_nombre,
+        COUNT(r.id) AS total_ayudas
+      FROM routine_request_stats r
+      INNER JOIN users u ON r.instructor_id = u.id
+      GROUP BY u.id, u.name
+      ORDER BY total_ayudas DESC
+    `;
+
+    const [result] = await pool.query(query);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error al obtener ayudas por profesor:', error);
+    res.status(500).json({ error: 'Error al obtener ayudas por profesor' });
+  }
+});
+
 if (!PORT) {
   console.error('El puerto no está definido en el archivo de configuración.');
   process.exit(1);

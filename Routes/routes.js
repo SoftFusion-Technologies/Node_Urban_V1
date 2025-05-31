@@ -61,8 +61,11 @@ import {
   OBR_RoutineRequest_CTS,
   CR_RoutineRequest_CTS,
   ER_RoutineRequest_CTS,
-  UR_RoutineRequest_CTS
+  UR_RoutineRequest_CTS,
+  atenderSolicitud // <-- (marcar como atendida)
 } from '../Controllers/CTS_TB_RoutineRequests.js';
+
+// import { getStats } from '../Controllers/CTS_TB_RoutineRequestStats.js';
 
 import {
   OBR_StudentsPendientes_CTS,
@@ -188,20 +191,18 @@ router.put('/routine-feedback/:id', UR_RoutineFeedback_CTS);
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
-// Obtener todas las solicitudes o filtrar por estado
+// Rutas para routine_requests
 router.get('/routine_requests', OBRS_RoutineRequests_CTS);
-
-// Obtener una solicitud por ID
 router.get('/routine_requests/:id', OBR_RoutineRequest_CTS);
-
-// Crear una nueva solicitud
 router.post('/routine_requests', CR_RoutineRequest_CTS);
-
-// Eliminar una solicitud por ID
 router.delete('/routine_requests/:id', ER_RoutineRequest_CTS);
-
-// Actualizar una solicitud por ID
 router.put('/routine_requests/:id', UR_RoutineRequest_CTS);
+
+// Nueva ruta para marcar solicitud como atendida y mover a stats
+router.post('/routine_requests/atender/:id', atenderSolicitud);
+
+// Ruta para consultar estadísticas
+// router.get('/routine_request_stats', getStats);
 // ----------------------------------------------------------------
 
 // GET /api/students-pendientes           → Obtener todos o filtrar por user_id

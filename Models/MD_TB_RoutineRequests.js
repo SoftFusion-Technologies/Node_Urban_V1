@@ -12,6 +12,7 @@
 import dotenv from 'dotenv';
 import db from '../DataBase/db.js';
 import { DataTypes } from 'sequelize';
+import RoutinesModel from './MD_TB_Routines.js';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -51,5 +52,10 @@ const RoutineRequestsModel = db.define(
     timestamps: false
   }
 );
+
+RoutineRequestsModel.belongsTo(RoutinesModel, {
+  foreignKey: 'routine_id',
+  as: 'routine'
+});
 
 export default RoutineRequestsModel;

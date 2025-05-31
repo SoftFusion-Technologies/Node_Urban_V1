@@ -16,6 +16,7 @@ import dotenv from 'dotenv';
 import db from '../DataBase/db.js';
 import { DataTypes } from 'sequelize';
 import StudentsModel from './MD_TB_Students.js'; // Importa el modelo de students para la asociación
+import RoutinesModel from './MD_TB_Routines.js'; // Importa el modelo de students para la asociación
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -73,5 +74,10 @@ const UsersModel = db.define(
 
 // Definición de la relación: un usuario puede tener muchos alumnos
 UsersModel.hasMany(StudentsModel, { foreignKey: 'user_id', as: 'students' });
+UsersModel.hasMany(RoutinesModel, {
+  foreignKey: 'instructor_id',
+  as: 'routines'
+});
+
 
 export default UsersModel;
