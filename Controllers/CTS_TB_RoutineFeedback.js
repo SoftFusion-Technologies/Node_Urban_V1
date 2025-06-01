@@ -46,9 +46,29 @@ export const OBR_RoutineFeedback_CTS = async (req, res) => {
   }
 };
 
-// Crear un nuevo feedback
 export const CR_RoutineFeedback_CTS = async (req, res) => {
   try {
+    console.log('Datos recibidos:', req.body);
+
+    const { routine_id, student_id } = req.body;
+
+    if (!routine_id || !student_id) {
+      return res.status(400).json({
+        mensajeError: 'Faltan datos obligatorios: routine_id o student_id'
+      });
+    }
+
+    // Validar si ya existe feedback
+    const existeFeedback = await RoutineFeedbackModel.findOne({
+      where: { routine_id, student_id }
+    });
+
+    if (existeFeedback) {
+      return res
+        .status(400)
+        .json({ mensajeError: 'Ya has enviado feedback para esta rutina.' });
+    }
+
     const registro = await RoutineFeedbackModel.create(req.body);
     res.json({ message: 'Feedback creado correctamente', registro });
   } catch (error) {
