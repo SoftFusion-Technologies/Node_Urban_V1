@@ -266,6 +266,86 @@ app.get('/routine-feedbacks', async (req, res) => {
   }
 });
 
+app.get('/students/:studentId/progress', async (req, res) => {
+  const { studentId } = req.params;
+
+  try {
+    // 1. Objetivos mensuales del alumno
+    const [monthlyGoals] = await pool.query(
+      `SELECT mes, anio, objetivo, created_at, updated_at
+       FROM student_monthly_goals
+       WHERE student_id = ? 
+       ORDER BY anio DESC, mes DESC`,
+      [studentId]
+    );
+
+    // 2. Rutinas con ejercicios, feedback y solicitudes, usando el query que pasaste
+    const [progressDetails] = await pool.query(
+      `SELECT 
+          r.id AS rutina_id,
+          r.fecha,
+          r.mes,
+          r.anio,
+          rf.gusto,
+          rf.dificultad,
+          rf.comentario,
+          e.id AS ejercicio_id,
+          e.musculo,
+          e.descripcion,
+          e.orden,
+          rr.estado AS solicitud_estado,
+          rr.mensaje AS solicitud_mensaje
+       FROM routines r
+       LEFT JOIN routine_feedback rf ON rf.routine_id = r.id AND rf.student_id = r.student_id
+       LEFT JOIN routine_exercises e ON e.routine_id = r.id
+       LEFT JOIN routine_requests rr ON rr.routine_id = r.id AND rr.student_id = r.student_id AND rr.exercise_id = e.id
+       WHERE r.student_id = ?
+       ORDER BY r.fecha DESC, e.orden`,
+      [studentId]
+    );
+
+    // 3. Procesar la info para agrupar por rutina y ejercicios
+    const routines = {};
+    progressDetails.forEach((row) => {
+      if (!routines[row.rutina_id]) {
+        routines[row.rutina_id] = {
+          rutina_id: row.rutina_id,
+          fecha: row.fecha,
+          mes: row.mes,
+          anio: row.anio,
+          feedback: {
+            gusto: row.gusto,
+            dificultad: row.dificultad,
+            comentario: row.comentario
+          },
+          ejercicios: []
+        };
+      }
+      if (row.ejercicio_id) {
+        routines[row.rutina_id].ejercicios.push({
+          ejercicio_id: row.ejercicio_id,
+          musculo: row.musculo,
+          descripcion: row.descripcion,
+          orden: row.orden,
+          solicitud: {
+            estado: row.solicitud_estado,
+            mensaje: row.solicitud_mensaje
+          }
+        });
+      }
+    });
+
+    res.json({
+      studentId,
+      monthlyGoals,
+      routines: Object.values(routines)
+    });
+  } catch (error) {
+    console.error('Error fetching student progress:', error);
+    res.status(500).json({ error: 'Error al obtener progreso del alumno' });
+  }
+});
+
 if (!PORT) {
   console.error('El puerto no está definido en el archivo de configuración.');
   process.exit(1);

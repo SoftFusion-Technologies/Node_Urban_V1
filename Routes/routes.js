@@ -84,6 +84,13 @@ import {
   UR_Leads_CTS
 } from '../Controllers/CTS_TB_Leads.js';
 
+import {
+  OBRS_StudentMonthlyGoals_CTS,
+  OBR_StudentMonthlyGoals_CTS,
+  CR_StudentMonthlyGoals_CTS,
+  ER_StudentMonthlyGoals_CTS,
+  UR_StudentMonthlyGoals_CTS
+} from '../Controllers/CTS_TB_StudentMonthlyGoals.js';
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -238,5 +245,22 @@ router.delete('/leads/:id', ER_Leads_CTS);
 
 // Actualizar un lead por su ID
 router.put('/leads/:id', UR_Leads_CTS);
+
+// Obtener todos los objetivos o filtrarlos por student_id, mes, año
+router.get('/student-monthly-goals', OBRS_StudentMonthlyGoals_CTS);
+
+// Obtener un objetivo específico por su ID
+router.get('/student-monthly-goals/:id', OBR_StudentMonthlyGoals_CTS);
+
+// Crear un nuevo objetivo (o varios)
+router.post('/student-monthly-goals', CR_StudentMonthlyGoals_CTS);
+
+// Eliminar un objetivo por su ID
+router.delete('/student-monthly-goals/:id', ER_StudentMonthlyGoals_CTS);
+
+// Actualizar un objetivo por su ID
+router.put('/student-monthly-goals/:id', UR_StudentMonthlyGoals_CTS);
+
+
 // Exporta el enrutador
 export default router;
