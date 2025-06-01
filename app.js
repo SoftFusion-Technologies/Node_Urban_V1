@@ -149,6 +149,85 @@ app.get('/estadisticas/ayudas-por-profesor', async (req, res) => {
   }
 });
 
+app.get('/routine-feedbacks', async (req, res) => {
+  try {
+    const instructorId = req.query.instructor_id;
+
+    if (!instructorId) {
+      return res
+        .status(400)
+        .json({ error: 'Se requiere instructor_id como parámetro' });
+    }
+
+    const query = `
+      SELECT 
+        rf.id AS feedback_id,
+        rf.gusto,
+        rf.dificultad,
+        rf.comentario,
+        rf.created_at AS feedback_date,
+        r.id AS rutina_id,
+        r.mes,
+        r.anio,
+        r.fecha AS rutina_fecha,
+        s.nomyape AS alumno,
+        s.id AS student_id,
+        u.name AS instructor,
+        u.id AS instructor_id
+      FROM routine_feedback rf
+      JOIN routines r ON rf.routine_id = r.id
+      JOIN students s ON rf.student_id = s.id
+      JOIN users u ON s.user_id = u.id
+      WHERE s.user_id = ?
+      ORDER BY r.fecha DESC, s.nomyape
+    `;
+
+    const [feedbackRows] = await pool.query(query, [instructorId]);
+
+    const rutinaIds = [...new Set(feedbackRows.map((fb) => fb.rutina_id))];
+    if (rutinaIds.length === 0) {
+      return res.json([]);
+    }
+
+    const [exerciseRows] = await pool.query(
+      `SELECT id, routine_id, musculo, descripcion, orden, desde, hasta, created_at, updated_at 
+       FROM routine_exercises 
+       WHERE routine_id IN (?) ORDER BY routine_id, orden`,
+      [rutinaIds]
+    );
+
+    const exercisesByRoutine = exerciseRows.reduce((acc, ex) => {
+      if (!acc[ex.routine_id]) acc[ex.routine_id] = [];
+      acc[ex.routine_id].push(ex);
+      return acc;
+    }, {});
+
+    const feedbackWithRoutine = feedbackRows.map((fb) => ({
+      feedback_id: fb.feedback_id,
+      gusto: fb.gusto,
+      dificultad: fb.dificultad,
+      comentario: fb.comentario,
+      feedback_date: fb.feedback_date,
+      rutina: {
+        id: fb.rutina_id,
+        mes: fb.mes,
+        anio: fb.anio,
+        fecha: fb.rutina_fecha,
+        exercises: exercisesByRoutine[fb.rutina_id] || []
+      },
+      alumno: fb.alumno,
+      student_id: fb.student_id,
+      instructor: fb.instructor,
+      instructor_id: fb.instructor_id
+    }));
+
+    res.json(feedbackWithRoutine);
+  } catch (error) {
+    console.error('Error al obtener feedbacks:', error);
+    res.status(500).json({ error: 'Error al obtener feedbacks' });
+  }
+});
+
 if (!PORT) {
   console.error('El puerto no está definido en el archivo de configuración.');
   process.exit(1);
