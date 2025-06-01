@@ -148,15 +148,15 @@ app.get('/estadisticas/ayudas-por-profesor', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener ayudas por profesor' });
   }
 });
-
 app.get('/routine-feedbacks', async (req, res) => {
   try {
     const instructorId = req.query.instructor_id;
+    const studentId = req.query.student_id;
 
-    if (!instructorId) {
-      return res
-        .status(400)
-        .json({ error: 'Se requiere instructor_id como parámetro' });
+    if (!instructorId || !studentId) {
+      return res.status(400).json({
+        error: 'Se requieren instructor_id y student_id como parámetros'
+      });
     }
 
     const query = `
@@ -178,11 +178,11 @@ app.get('/routine-feedbacks', async (req, res) => {
       JOIN routines r ON rf.routine_id = r.id
       JOIN students s ON rf.student_id = s.id
       JOIN users u ON s.user_id = u.id
-      WHERE s.user_id = ?
+      WHERE u.id = ? AND s.id = ?
       ORDER BY r.fecha DESC, s.nomyape
     `;
 
-    const [feedbackRows] = await pool.query(query, [instructorId]);
+    const [feedbackRows] = await pool.query(query, [instructorId, studentId]);
 
     const rutinaIds = [...new Set(feedbackRows.map((fb) => fb.rutina_id))];
     if (rutinaIds.length === 0) {
