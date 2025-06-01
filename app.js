@@ -78,7 +78,7 @@ app.get('/', (req, res) => {
 });
 
 /*
- * MODULO ESTADISTICAS
+ * MODULO ESTADISTICAS INICIO
  */
 // Endpoint que devuelve el total de alumnos por profesor
 // GET /estadisticas/alumnos-por-profesor
@@ -148,6 +148,44 @@ app.get('/estadisticas/ayudas-por-profesor', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener ayudas por profesor' });
   }
 });
+
+app.get('/estadisticas/feedbacks-por-profesor', async (req, res) => {
+  try {
+    const { mes, anio } = req.query;
+
+    if (!mes || !anio) {
+      return res.status(400).json({
+        error: 'Se requieren los parámetros "mes" y "anio"'
+      });
+    }
+
+    const query = `
+      SELECT 
+        u.id AS profesor_id,
+        u.name AS profesor_nombre,
+        COUNT(rf.id) AS total_feedbacks
+      FROM routine_feedback rf
+      JOIN students s ON rf.student_id = s.id
+      JOIN users u ON s.user_id = u.id
+      WHERE MONTH(rf.created_at) = ? AND YEAR(rf.created_at) = ?
+      GROUP BY u.id, u.name
+      ORDER BY total_feedbacks DESC
+    `;
+
+    const [result] = await pool.query(query, [mes, anio]);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error al obtener feedbacks por profesor:', error);
+    res.status(500).json({ error: 'Error al obtener feedbacks por profesor' });
+  }
+});
+
+
+/*
+ * MODULO ESTADISTICAS FINAL
+ */
+
 app.get('/routine-feedbacks', async (req, res) => {
   try {
     const instructorId = req.query.instructor_id;
