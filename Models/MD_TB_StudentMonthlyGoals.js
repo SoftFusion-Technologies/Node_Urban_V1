@@ -1,10 +1,11 @@
 /*
  * Programador: Benjamin Orellana
  * Fecha Creación: 01 /06 / 2025
- * Versión: 1.0
+ * Versión: 1.1
  *
  * Descripción:
- * Este archivo (MD_TB_StudentMonthlyGoals.js) contiene la definición del modelo Sequelize para la tabla student_monthly_goals.
+ * Este archivo (MD_TB_StudentMonthlyGoals.js) contiene la definición del modelo Sequelize para la tabla student_monthly_goals,
+ * incluyendo campos físicos para seguimiento de progreso mensual.
  * Tema: Modelos - StudentMonthlyGoals
  * Capa: Backend
  */
@@ -40,6 +41,37 @@ const StudentMonthlyGoalsModel = db.define(
     objetivo: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    altura_cm: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true
+    },
+    peso_kg: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true
+    },
+    edad: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    grasa_corporal: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true
+    },
+    cintura_cm: {
+      type: DataTypes.DECIMAL(5, 2),
+      allowNull: true
+    },
+    imc: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        const peso = parseFloat(this.getDataValue('peso_kg'));
+        const altura = parseFloat(this.getDataValue('altura_cm'));
+        if (peso && altura) {
+          return +(peso / Math.pow(altura / 100, 2)).toFixed(2);
+        }
+        return null;
+      }
     },
     created_at: {
       type: DataTypes.DATE,
