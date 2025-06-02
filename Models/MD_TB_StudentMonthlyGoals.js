@@ -54,6 +54,10 @@ const StudentMonthlyGoalsModel = db.define(
       type: DataTypes.INTEGER,
       allowNull: true
     },
+    control_antropometrico: {
+      type: DataTypes.ENUM('SI', 'NO'),
+      allowNull: true
+    },
     grasa_corporal: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: true

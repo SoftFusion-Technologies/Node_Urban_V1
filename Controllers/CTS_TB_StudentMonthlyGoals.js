@@ -39,13 +39,19 @@ export const OBRS_StudentMonthlyGoals_CTS = async (req, res) => {
   }
 };
 
-// Obtener un objetivo por su ID
+// Obtener el objetivo mensual por student_id
 export const OBR_StudentMonthlyGoals_CTS = async (req, res) => {
   try {
-    const objetivo = await StudentMonthlyGoalsModel.findByPk(req.params.id);
+    const objetivo = await StudentMonthlyGoalsModel.findOne({
+      where: { student_id: req.params.id }
+    });
+
     if (!objetivo) {
-      return res.status(404).json({ mensajeError: 'Objetivo no encontrado' });
+      return res
+        .status(404)
+        .json({ mensajeError: 'Objetivo no encontrado para este estudiante' });
     }
+
     res.json(objetivo);
   } catch (error) {
     res.status(500).json({ mensajeError: error.message });
