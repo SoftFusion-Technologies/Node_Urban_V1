@@ -42,6 +42,11 @@ const StudentMonthlyGoalsModel = db.define(
       type: DataTypes.TEXT,
       allowNull: false
     },
+    estado: {
+      type: DataTypes.ENUM('EN_PROGRESO', 'COMPLETADO', 'NO_CUMPLIDO'),
+      allowNull: false,
+      defaultValue: 'EN_PROGRESO'
+    },
     altura_cm: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: true
