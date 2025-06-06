@@ -91,6 +91,33 @@ import {
   ER_StudentMonthlyGoals_CTS,
   UR_StudentMonthlyGoals_CTS
 } from '../Controllers/CTS_TB_StudentMonthlyGoals.js';
+
+// NUEVO MODULO DE PROGRESO PARA ALUMNOS
+import {
+  OBRS_StudentProgress_CTS,
+  OBR_StudentProgress_CTS,
+  CR_StudentProgress_CTS,
+  UR_StudentProgress_CTS,
+  ER_StudentProgress_CTS
+} from '../Controllers/AlumnProgress/CTS_TB_StudentProgress.js';
+
+import {
+  OBRS_StudentWeeklyCheckin_CTS,
+  OBR_StudentWeeklyCheckin_CTS,
+  CR_StudentWeeklyCheckin_CTS,
+  UR_StudentWeeklyCheckin_CTS,
+  ER_StudentWeeklyCheckin_CTS
+} from '../Controllers/AlumnProgress/CTS_TB_StudentWeeklyCheckin.js';
+
+import {
+  OBRS_StudentAchievements_CTS,
+  OBR_StudentAchievement_CTS,
+  CR_StudentAchievement_CTS,
+  UR_StudentAchievement_CTS,
+  ER_StudentAchievement_CTS
+} from '../Controllers/AlumnProgress/CTS_TB_StudentAchievements.js';
+// NUEVO MODULO DE PROGRESO PARA ALUMNOS
+
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -261,6 +288,62 @@ router.delete('/student-monthly-goals/:id', ER_StudentMonthlyGoals_CTS);
 // Actualizar un objetivo por su ID
 router.put('/student-monthly-goals/:id', UR_StudentMonthlyGoals_CTS);
 
+
+// ===========================
+// NUEVO MODULO DE PROGRESO PARA ALUMNOS
+// ===========================
+
+// Progreso mensual del alumno
+// Obtener todos los progresos o filtrarlos por student_id, mes y año
+router.get('/student-monthly-progress', OBRS_StudentProgress_CTS);
+
+// Obtener un progreso específico por ID
+router.get('/student-monthly-progress/:id', OBR_StudentProgress_CTS);
+
+// Crear nuevo progreso
+router.post('/student-monthly-progress', CR_StudentProgress_CTS);
+
+// Actualizar progreso por ID
+router.put('/student-monthly-progress/:id', UR_StudentProgress_CTS);
+
+// Eliminar progreso por ID
+router.delete('/student-monthly-progress/:id', ER_StudentProgress_CTS);
+
+// ----------------------------------------
+
+// Check-in semanal del alumno
+// Obtener todos los check-ins o filtrarlos por student_id, semana y año
+router.get('/student-weekly-checkin', OBRS_StudentWeeklyCheckin_CTS);
+
+// Obtener un check-in específico por ID
+router.get('/student-weekly-checkin/:id', OBR_StudentWeeklyCheckin_CTS);
+
+// Crear nuevo check-in
+router.post('/student-weekly-checkin', CR_StudentWeeklyCheckin_CTS);
+
+// Actualizar check-in por ID
+router.put('/student-weekly-checkin/:id', UR_StudentWeeklyCheckin_CTS);
+
+// Eliminar check-in por ID
+router.delete('/student-weekly-checkin/:id', ER_StudentWeeklyCheckin_CTS);
+
+// ----------------------------------------
+
+// Logros del alumno
+// Obtener todos los logros o filtrarlos por student_id
+router.get('/student-achievements', OBRS_StudentAchievements_CTS);
+
+// Obtener un logro específico por ID
+router.get('/student-achievements/:id', OBR_StudentAchievement_CTS);
+
+// Crear nuevo logro
+router.post('/student-achievements', CR_StudentAchievement_CTS);
+
+// Actualizar logro por ID
+router.put('/student-achievements/:id', UR_StudentAchievement_CTS);
+
+// Eliminar logro por ID
+router.delete('/student-achievements/:id', ER_StudentAchievement_CTS);
 
 // Exporta el enrutador
 export default router;
