@@ -181,7 +181,6 @@ app.get('/estadisticas/feedbacks-por-profesor', async (req, res) => {
   }
 });
 
-
 /*
  * MODULO ESTADISTICAS FINAL
  */
@@ -343,6 +342,127 @@ app.get('/students/:studentId/progress', async (req, res) => {
   } catch (error) {
     console.error('Error fetching student progress:', error);
     res.status(500).json({ error: 'Error al obtener progreso del alumno' });
+  }
+});
+
+app.get('/students/:studentId/progress-comparison', async (req, res) => {
+  const { studentId } = req.params;
+
+  try {
+    // 1. Obtener objetivos mensuales (igual que antes)
+    const [monthlyGoals] = await pool.query(
+      `SELECT 
+         id, mes, anio, objetivo,
+         peso_kg AS peso_objetivo,
+         altura_cm AS altura_objetivo,
+         grasa_corporal AS grasa_objetivo,
+         cintura_cm AS cintura_objetivo,
+         estado, created_at, updated_at
+       FROM student_monthly_goals
+       WHERE student_id = ?
+       ORDER BY anio DESC, mes DESC`,
+      [studentId]
+    );
+
+    // 2. Obtener progresos reales (igual que antes)
+    const [progresses] = await pool.query(
+      `SELECT 
+         id, student_id,
+         DATE_FORMAT(fecha, '%Y-%m') AS anio_mes,
+         MONTH(fecha) AS mes,
+         YEAR(fecha) AS anio,
+         peso_kg, altura_cm, grasa_corporal, cintura_cm,
+         comentario, fecha, created_at, updated_at
+       FROM student_progress
+       WHERE student_id = ?
+       ORDER BY fecha DESC`,
+      [studentId]
+    );
+
+    // 3. Obtener estadísticas semanales (nuevo)
+    const [weeklyStats] = await pool.query(
+      `SELECT 
+         anio,
+         AVG(energia_level) AS energia_promedio,
+         SUM(cumplio_rutina) AS semanas_cumplidas,
+         COUNT(*) AS total_semanas
+       FROM student_weekly_checkin
+       WHERE student_id = ?
+       GROUP BY anio
+       ORDER BY anio DESC`,
+      [studentId]
+    );
+
+    // 4. Agrupar progresos por mes y año para comparación (igual)
+    const progressGrouped = progresses.reduce((acc, prog) => {
+      const key = `${prog.anio}-${prog.mes.toString().padStart(2, '0')}`;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(prog);
+      return acc;
+    }, {});
+
+    // 5. Armar comparación mensual + extra (igual + extra)
+    const comparison = monthlyGoals.map((goal) => {
+      const key = `${goal.anio}-${goal.mes.toString().padStart(2, '0')}`;
+      const progresosDelMes = progressGrouped[key] || [];
+      const lastProgress =
+        progresosDelMes.length > 0 ? progresosDelMes[0] : null;
+
+      // Estadísticas semanales de ese año (si existen)
+      const weeklyStatForYear = weeklyStats.find((ws) => ws.anio === goal.anio);
+
+      const pesoObjetivo = parseFloat(goal.peso_objetivo);
+      const pesoActual = lastProgress ? parseFloat(lastProgress.peso_kg) : null;
+
+      let diferenciaPeso = null;
+      let cumplioObjetivoPeso = null;
+      let pesoRestanteParaObjetivo = null;
+
+      if (pesoActual !== null) {
+        diferenciaPeso = parseFloat((pesoActual - pesoObjetivo).toFixed(2));
+        cumplioObjetivoPeso = pesoActual <= pesoObjetivo - 3;
+        pesoRestanteParaObjetivo = cumplioObjetivoPeso
+          ? 0
+          : parseFloat((pesoActual - (pesoObjetivo - 3)).toFixed(2));
+      }
+
+      return {
+        goalId: goal.id,
+        mes: goal.mes,
+        anio: goal.anio,
+        objetivo: goal.objetivo,
+        estadoObjetivo: goal.estado,
+        pesoObjetivo: goal.peso_objetivo,
+        alturaObjetivo: goal.altura_objetivo,
+        grasaObjetivo: goal.grasa_objetivo,
+        cinturaObjetivo: goal.cintura_objetivo,
+        ultimoProgreso: lastProgress
+          ? {
+              fecha: lastProgress.fecha,
+              peso: lastProgress.peso_kg,
+              altura: lastProgress.altura_cm,
+              grasa: lastProgress.grasa_corporal,
+              cintura: lastProgress.cintura_cm,
+              comentario: lastProgress.comentario
+            }
+          : null,
+        totalProgresosEnMes: progresosDelMes.length,
+        diferenciaPeso,
+        cumplioObjetivoPeso,
+        pesoRestanteParaObjetivo,
+        estadisticasSemanales: weeklyStatForYear || null
+      };
+    });
+
+    res.json({
+      studentId,
+      comparison
+    });
+  } catch (error) {
+    console.error('Error fetching progress comparison:', error);
+    res.status(500).json({
+      error: 'Error al obtener la comparación de progreso del alumno'
+    });
   }
 });
 

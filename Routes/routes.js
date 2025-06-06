@@ -295,19 +295,19 @@ router.put('/student-monthly-goals/:id', UR_StudentMonthlyGoals_CTS);
 
 // Progreso mensual del alumno
 // Obtener todos los progresos o filtrarlos por student_id, mes y año
-router.get('/student-monthly-progress', OBRS_StudentProgress_CTS);
+router.get('/student-progress', OBRS_StudentProgress_CTS);
 
 // Obtener un progreso específico por ID
-router.get('/student-monthly-progress/:id', OBR_StudentProgress_CTS);
+router.get('/student-progress/:id', OBR_StudentProgress_CTS);
 
 // Crear nuevo progreso
-router.post('/student-monthly-progress', CR_StudentProgress_CTS);
+router.post('/student-progress', CR_StudentProgress_CTS);
 
 // Actualizar progreso por ID
-router.put('/student-monthly-progress/:id', UR_StudentProgress_CTS);
+router.put('/student-progress/:id', UR_StudentProgress_CTS);
 
 // Eliminar progreso por ID
-router.delete('/student-monthly-progress/:id', ER_StudentProgress_CTS);
+router.delete('/student-progress/:id', ER_StudentProgress_CTS);
 
 // ----------------------------------------
 
