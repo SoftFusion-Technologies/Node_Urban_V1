@@ -54,17 +54,47 @@ export const OBR_StudentProgress_CTS = async (req, res) => {
 export const CR_StudentProgress_CTS = async (req, res) => {
   try {
     const datos = req.body;
+    const { student_id, fecha } = datos;
 
-    const nuevoProgreso = await StudentProgressModel.create(datos);
+    if (!student_id || !fecha) {
+      return res
+        .status(400)
+        .json({ mensajeError: 'student_id y fecha son requeridos' });
+    }
 
-    return res.json({
-      message: 'Progreso creado correctamente',
-      nuevoProgreso
+    // Buscar progreso existente para student_id y fecha
+    const progresoExistente = await StudentProgressModel.findOne({
+      where: { student_id, fecha }
     });
+
+    if (progresoExistente) {
+      // Actualizar progreso existente
+      await StudentProgressModel.update(datos, {
+        where: { id: progresoExistente.id }
+      });
+
+      const progresoActualizado = await StudentProgressModel.findByPk(
+        progresoExistente.id
+      );
+
+      return res.json({
+        message: 'Progreso actualizado correctamente',
+        progreso: progresoActualizado
+      });
+    } else {
+      // Crear nuevo progreso
+      const nuevoProgreso = await StudentProgressModel.create(datos);
+
+      return res.json({
+        message: 'Progreso creado correctamente',
+        progreso: nuevoProgreso
+      });
+    }
   } catch (error) {
     res.status(500).json({ mensajeError: error.message });
   }
 };
+
 
 // Actualizar progreso por ID
 export const UR_StudentProgress_CTS = async (req, res) => {
