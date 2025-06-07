@@ -405,10 +405,16 @@ app.get('/students/:studentId/progress-comparison', async (req, res) => {
     const comparison = monthlyGoals.map((goal) => {
       const key = `${goal.anio}-${goal.mes.toString().padStart(2, '0')}`;
       const progresosDelMes = progressGrouped[key] || [];
-      const lastProgress =
-        progresosDelMes.length > 0 ? progresosDelMes[0] : null;
 
-      // Estadísticas semanales de ese año (si existen)
+      // Ordenar progresos por fecha ascendente (opcional)
+      progresosDelMes.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+      // Tomar el último progreso para cálculos resumidos (igual que antes)
+      const lastProgress =
+        progresosDelMes.length > 0
+          ? progresosDelMes[progresosDelMes.length - 1]
+          : null;
+
       const weeklyStatForYear = weeklyStats.find((ws) => ws.anio === goal.anio);
 
       const pesoObjetivo = parseFloat(goal.peso_objetivo);
@@ -436,16 +442,17 @@ app.get('/students/:studentId/progress-comparison', async (req, res) => {
         alturaObjetivo: goal.altura_objetivo,
         grasaObjetivo: goal.grasa_objetivo,
         cinturaObjetivo: goal.cintura_objetivo,
-        ultimoProgreso: lastProgress
-          ? {
-              fecha: lastProgress.fecha,
-              peso: lastProgress.peso_kg,
-              altura: lastProgress.altura_cm,
-              grasa: lastProgress.grasa_corporal,
-              cintura: lastProgress.cintura_cm,
-              comentario: lastProgress.comentario
-            }
-          : null,
+
+        // Aquí agregamos TODOS los progresos del mes
+        progresosDelMes: progresosDelMes.map((prog) => ({
+          fecha: prog.fecha,
+          peso: prog.peso_kg,
+          altura: prog.altura_cm,
+          grasa: prog.grasa_corporal,
+          cintura: prog.cintura_cm,
+          comentario: prog.comentario
+        })),
+
         totalProgresosEnMes: progresosDelMes.length,
         diferenciaPeso,
         cumplioObjetivoPeso,
