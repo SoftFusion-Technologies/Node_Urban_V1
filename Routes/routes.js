@@ -119,6 +119,33 @@ import {
 } from '../Controllers/AlumnProgress/CTS_TB_StudentAchievements.js';
 // NUEVO MODULO DE PROGRESO PARA ALUMNOS
 
+// NUEVO MODULO DE DIETAS
+import {
+  OBRS_Diets_CTS,
+  OBR_Diets_CTS,
+  CR_Diets_CTS,
+  UR_Diets_CTS,
+  ER_Diets_CTS
+} from '../Controllers/Diets/CTS_TB_Diets.js';
+
+import {
+  OBRS_Meals_CTS,
+  OBR_Meals_CTS,
+  CR_Meals_CTS,
+  UR_Meals_CTS,
+  ER_Meals_CTS
+} from '../Controllers/Diets/CTS_TB_Meals.js';
+
+import {
+  OBRS_MealItems_CTS,
+  OBR_MealItems_CTS,
+  CR_MealItems_CTS,
+  UR_MealItems_CTS,
+  ER_MealItems_CTS
+} from '../Controllers/Diets/CTS_TB_MealItems.js';
+
+// NUEVO MODULO DE DIETAS
+
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -291,7 +318,6 @@ router.delete('/student-monthly-goals/:id', ER_StudentMonthlyGoals_CTS);
 // Actualizar un objetivo por su ID
 router.put('/student-monthly-goals/:id', UR_StudentMonthlyGoals_CTS);
 
-
 // ===========================
 // NUEVO MODULO DE PROGRESO PARA ALUMNOS
 // ===========================
@@ -348,5 +374,24 @@ router.put('/student-achievements/:id', UR_StudentAchievement_CTS);
 // Eliminar logro por ID
 router.delete('/student-achievements/:id', ER_StudentAchievement_CTS);
 
+// NUEVO MODULO DE DIETAS
+router.get('/diets', OBRS_Diets_CTS);
+router.get('/diets/:id', OBR_Diets_CTS);
+router.post('/diets', CR_Diets_CTS);
+router.put('/diets/:id', UR_Diets_CTS);
+router.delete('/diets/:id', ER_Diets_CTS);
+
+router.get('/meals', OBRS_Meals_CTS);
+router.get('/meals/:id', OBR_Meals_CTS);
+router.post('/meals', CR_Meals_CTS);
+router.put('/meals/:id', UR_Meals_CTS);
+router.delete('/meals/:id', ER_Meals_CTS);
+
+router.get('/meal_items', OBRS_MealItems_CTS);
+router.get('/meal_items/:id', OBR_MealItems_CTS);
+router.post('/meal_items', CR_MealItems_CTS);
+router.put('/meal_items/:id', UR_MealItems_CTS);
+router.delete('/meal_items/:id', ER_MealItems_CTS);
+// NUEVO MODULO DE DIETAS
 // Exporta el enrutador
 export default router;
