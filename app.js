@@ -18,6 +18,9 @@ import {
 import { PORT } from './DataBase/config.js';
 import mysql from 'mysql2/promise'; // Usar mysql2 para las promesas
 
+import DietsModel from './Models/Diets/MD_TB_Diets.js';
+import MealsModel from './Models/Diets/MD_TB_Meals.js';
+import MealItemsModel from './Models/Diets/MD_TB_MealItems.js';
 // CONFIGURACION PRODUCCION
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -593,6 +596,32 @@ app.get('/students/:studentId/progress-comparison', async (req, res) => {
     res.status(500).json({
       error: 'Error al obtener la comparación de progreso del alumno'
     });
+  }
+});
+
+app.get('/dietss/:id', async (req, res) => {
+  try {
+    const dietId = req.params.id;
+
+    const diet = await DietsModel.findByPk(dietId, {
+      include: {
+        model: MealsModel,
+        as: 'meals',
+        include: {
+          model: MealItemsModel,
+          as: 'items'
+        }
+      }
+    });
+
+    if (!diet) {
+      return res.status(404).json({ error: 'Dieta no encontrada' });
+    }
+
+    res.json(diet);
+  } catch (error) {
+    console.error('Error al obtener dieta:', error);
+    res.status(500).json({ error: 'Error al obtener dieta' });
   }
 });
 
