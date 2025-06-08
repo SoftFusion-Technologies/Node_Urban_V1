@@ -599,11 +599,9 @@ app.get('/students/:studentId/progress-comparison', async (req, res) => {
   }
 });
 
-app.get('/dietss/:id', async (req, res) => {
+app.get('/dietss/', async (req, res) => {
   try {
-    const dietId = req.params.id;
-
-    const diet = await DietsModel.findByPk(dietId, {
+    const diet = await DietsModel.findAll({
       include: {
         model: MealsModel,
         as: 'meals',
