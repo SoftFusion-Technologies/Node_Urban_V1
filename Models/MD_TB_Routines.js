@@ -41,6 +41,11 @@ const RoutinesModel = db.define(
       type: DataTypes.DATEONLY,
       allowNull: false
     },
+    completado: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: true

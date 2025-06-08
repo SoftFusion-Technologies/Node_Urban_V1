@@ -152,3 +152,27 @@ export const DL_UpdateMuscleName_CTS = async (req, res) => {
     return res.status(500).json({ mensajeError: error.message });
   }
 };
+
+// Marcar una rutina como completada
+export const UR_CompletarRutina_CTS = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [actualizadas] = await RoutinesModel.update(
+      { completado: true },
+      { where: { id } }
+    );
+
+    if (actualizadas === 1) {
+      const rutinaCompletada = await RoutinesModel.findByPk(id);
+      return res.json({
+        message: 'Rutina marcada como completada',
+        rutinaCompletada
+      });
+    } else {
+      return res.status(404).json({ mensajeError: 'Rutina no encontrada' });
+    }
+  } catch (error) {
+    return res.status(500).json({ mensajeError: error.message });
+  }
+};

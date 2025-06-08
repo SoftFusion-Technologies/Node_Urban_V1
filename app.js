@@ -185,6 +185,193 @@ app.get('/estadisticas/feedbacks-por-profesor', async (req, res) => {
  * MODULO ESTADISTICAS FINAL
  */
 
+/*
+ * MODULO ESTADISTICAS ALUMNO INICIAL
+ */
+
+app.get('/estadisticas/rutinas-por-alumno', async (req, res) => {
+  try {
+    const { student_id, mes, anio } = req.query;
+
+    if (!student_id || !mes || !anio) {
+      return res.status(400).json({
+        error: 'Se requieren los parámetros "student_id", "mes" y "anio"'
+      });
+    }
+
+    const query = `
+      SELECT 
+        COUNT(*) AS total_rutinas_cargadas,
+        SUM(CASE WHEN completado = TRUE THEN 1 ELSE 0 END) AS total_rutinas_completadas
+      FROM routines
+      WHERE student_id = ?
+        AND MONTH(fecha) = ?
+        AND YEAR(fecha) = ?
+    `;
+
+    const [result] = await pool.query(query, [student_id, mes, anio]);
+
+    res.status(200).json(result[0]);
+  } catch (error) {
+    console.error('Error al obtener rutinas por alumno:', error);
+    res.status(500).json({ error: 'Error al obtener rutinas por alumno' });
+  }
+});
+// 2. Promedio dificultad y % gusto por alumno (en mes/año)
+app.get('/estadisticas/feedback-alumno', async (req, res) => {
+  try {
+    const { student_id, mes, anio } = req.query;
+    if (!student_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+
+    const query = `
+      SELECT 
+        AVG(CASE rf.dificultad 
+              WHEN 'fácil' THEN 1 
+              WHEN 'normal' THEN 2 
+              WHEN 'difícil' THEN 3 
+              ELSE NULL END) AS dificultad_promedio,
+        SUM(CASE WHEN rf.gusto = TRUE THEN 1 ELSE 0 END) / COUNT(rf.id) * 100 AS porcentaje_gusto
+      FROM routine_feedback rf
+      JOIN routines r ON rf.routine_id = r.id
+      WHERE rf.student_id = ? AND r.mes = ? AND r.anio = ?
+    `;
+    const [result] = await pool.query(query, [student_id, mes, anio]);
+    res.json(result[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener feedback por alumno' });
+  }
+});
+
+// 3. Cantidad de solicitudes de ayuda por alumno y estado
+app.get('/estadisticas/solicitudes-por-alumno', async (req, res) => {
+  try {
+    const { student_id, mes, anio } = req.query;
+    if (!student_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+
+    const query = `
+      SELECT 
+        estado,
+        COUNT(*) AS total_solicitudes
+      FROM routine_requests rr
+      JOIN routines r ON rr.routine_id = r.id
+      WHERE rr.student_id = ? AND MONTH(rr.created_at) = ? AND YEAR(rr.created_at) = ?
+      GROUP BY estado
+    `;
+    const [results] = await pool.query(query, [student_id, mes, anio]);
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener solicitudes por alumno' });
+  }
+});
+
+// 4. Estado de metas mensuales y progreso antropométrico (último registro)
+app.get('/estadisticas/metas-progresos', async (req, res) => {
+  try {
+    const { student_id, mes, anio } = req.query;
+    if (!student_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+
+    // Estado de meta mensual
+    const metasQuery = `
+      SELECT objetivo, estado, altura_cm, peso_kg, edad, grasa_corporal, cintura_cm, imc, control_antropometrico
+      FROM student_monthly_goals
+      WHERE student_id = ? AND mes = ? AND anio = ?
+      LIMIT 1
+    `;
+
+    // Último progreso antropométrico antes o igual al mes y año
+    const progresoQuery = `
+      SELECT peso_kg, altura_cm, grasa_corporal, cintura_cm, imc, comentario, fecha
+      FROM student_progress
+      WHERE student_id = ? AND YEAR(fecha) = ? AND MONTH(fecha) = ?
+      ORDER BY fecha DESC
+      LIMIT 1
+    `;
+
+    const [[meta], [progreso]] = await Promise.all([
+      pool.query(metasQuery, [student_id, mes, anio]),
+      pool.query(progresoQuery, [student_id, anio, mes])
+    ]);
+
+    res.json({ meta: meta[0] || null, progreso: progreso[0] || null });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener metas y progresos' });
+  }
+});
+
+// 5. Ranking alumnos más activos (más rutinas completadas) en mes/año
+app.get('/estadisticas/ranking-activos', async (req, res) => {
+  try {
+    const { mes, anio } = req.query;
+    if (!mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+
+    const query = `
+      SELECT s.id AS student_id, s.nomyape, 
+        COUNT(r.id) AS rutinas_asignadas,
+        SUM(CASE WHEN r.completado = TRUE THEN 1 ELSE 0 END) AS rutinas_completadas
+      FROM students s
+      LEFT JOIN routines r ON s.id = r.student_id AND r.mes = ? AND r.anio = ?
+      GROUP BY s.id
+      ORDER BY rutinas_completadas DESC
+      LIMIT 10
+    `;
+    const [results] = await pool.query(query, [mes, anio]);
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener ranking de alumnos activos' });
+  }
+});
+
+// 6. Estadísticas por instructor: rutinas creadas, feedbacks, solicitudes atendidas
+app.get('/estadisticas/instructor', async (req, res) => {
+  try {
+    const { instructor_id, mes, anio } = req.query;
+    if (!instructor_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+
+    const queryRutinas = `
+      SELECT COUNT(*) AS total_rutinas
+      FROM routines
+      WHERE instructor_id = ? AND mes = ? AND anio = ?
+    `;
+
+    const queryFeedbacks = `
+      SELECT COUNT(*) AS total_feedbacks
+      FROM routine_feedback rf
+      JOIN routines r ON rf.routine_id = r.id
+      WHERE r.instructor_id = ? AND r.mes = ? AND r.anio = ?
+    `;
+
+    const querySolicitudes = `
+      SELECT COUNT(*) AS total_solicitudes_atendidas
+      FROM routine_requests rr
+      JOIN routines r ON rr.routine_id = r.id
+      WHERE r.instructor_id = ? AND MONTH(rr.created_at) = ? AND YEAR(rr.created_at) = ? AND rr.estado = 'atendido'
+    `;
+
+    const [[rutinas], [feedbacks], [solicitudes]] = await Promise.all([
+      pool.query(queryRutinas, [instructor_id, mes, anio]),
+      pool.query(queryFeedbacks, [instructor_id, mes, anio]),
+      pool.query(querySolicitudes, [instructor_id, mes, anio])
+    ]);
+
+    res.json({
+      total_rutinas: rutinas[0]?.total_rutinas || 0,
+      total_feedbacks: feedbacks[0]?.total_feedbacks || 0,
+      total_solicitudes_atendidas: solicitudes[0]?.total_solicitudes_atendidas || 0,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener estadísticas del instructor' });
+  }
+});
+/*
+ * MODULO ESTADISTICAS ALUMNO FINAL
+ */
+
+
 app.get('/routine-feedbacks', async (req, res) => {
   try {
     const instructorId = req.query.instructor_id;
