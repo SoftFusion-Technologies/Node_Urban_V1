@@ -221,7 +221,8 @@ app.get('/estadisticas/rutinas-por-alumno', async (req, res) => {
 app.get('/estadisticas/feedback-alumno', async (req, res) => {
   try {
     const { student_id, mes, anio } = req.query;
-    if (!student_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+    if (!student_id || !mes || !anio)
+      return res.status(400).json({ error: 'Faltan parámetros' });
 
     const query = `
       SELECT 
@@ -247,7 +248,8 @@ app.get('/estadisticas/feedback-alumno', async (req, res) => {
 app.get('/estadisticas/solicitudes-por-alumno', async (req, res) => {
   try {
     const { student_id, mes, anio } = req.query;
-    if (!student_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+    if (!student_id || !mes || !anio)
+      return res.status(400).json({ error: 'Faltan parámetros' });
 
     const query = `
       SELECT 
@@ -270,7 +272,8 @@ app.get('/estadisticas/solicitudes-por-alumno', async (req, res) => {
 app.get('/estadisticas/metas-progresos', async (req, res) => {
   try {
     const { student_id, mes, anio } = req.query;
-    if (!student_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+    if (!student_id || !mes || !anio)
+      return res.status(400).json({ error: 'Faltan parámetros' });
 
     // Estado de meta mensual
     const metasQuery = `
@@ -305,7 +308,8 @@ app.get('/estadisticas/metas-progresos', async (req, res) => {
 app.get('/estadisticas/ranking-activos', async (req, res) => {
   try {
     const { mes, anio } = req.query;
-    if (!mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+    if (!mes || !anio)
+      return res.status(400).json({ error: 'Faltan parámetros' });
 
     const query = `
       SELECT s.id AS student_id, s.nomyape, 
@@ -321,7 +325,9 @@ app.get('/estadisticas/ranking-activos', async (req, res) => {
     res.json(results);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener ranking de alumnos activos' });
+    res
+      .status(500)
+      .json({ error: 'Error al obtener ranking de alumnos activos' });
   }
 });
 
@@ -329,7 +335,8 @@ app.get('/estadisticas/ranking-activos', async (req, res) => {
 app.get('/estadisticas/instructor', async (req, res) => {
   try {
     const { instructor_id, mes, anio } = req.query;
-    if (!instructor_id || !mes || !anio) return res.status(400).json({ error: 'Faltan parámetros' });
+    if (!instructor_id || !mes || !anio)
+      return res.status(400).json({ error: 'Faltan parámetros' });
 
     const queryRutinas = `
       SELECT COUNT(*) AS total_rutinas
@@ -360,17 +367,19 @@ app.get('/estadisticas/instructor', async (req, res) => {
     res.json({
       total_rutinas: rutinas[0]?.total_rutinas || 0,
       total_feedbacks: feedbacks[0]?.total_feedbacks || 0,
-      total_solicitudes_atendidas: solicitudes[0]?.total_solicitudes_atendidas || 0,
+      total_solicitudes_atendidas:
+        solicitudes[0]?.total_solicitudes_atendidas || 0
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener estadísticas del instructor' });
+    res
+      .status(500)
+      .json({ error: 'Error al obtener estadísticas del instructor' });
   }
 });
 /*
  * MODULO ESTADISTICAS ALUMNO FINAL
  */
-
 
 app.get('/routine-feedbacks', async (req, res) => {
   try {
@@ -532,6 +541,32 @@ app.get('/students/:studentId/progress', async (req, res) => {
   }
 });
 
+function detectarTipoObjetivo(objetivoTexto) {
+  const texto = objetivoTexto.toLowerCase();
+
+  if (
+    texto.includes('perder') ||
+    texto.includes('bajar peso') ||
+    texto.includes('quemar')
+  )
+    return 'BAJAR_PESO';
+  if (
+    texto.includes('ganar') ||
+    texto.includes('subir peso') ||
+    texto.includes('musculo')
+  )
+    return 'SUBIR_PESO';
+  if (texto.includes('mantener')) return 'MANTENER_PESO';
+  if (texto.includes('fuerza')) return 'FUERZA';
+  if (texto.includes('estrés')) return 'BIENESTAR';
+  if (texto.includes('tonificar') || texto.includes('marcar'))
+    return 'TONIFICAR';
+  if (texto.includes('sin impacto') || texto.includes('me aburro'))
+    return 'OTRO_ESTILO';
+
+  return 'OTROS';
+}
+
 app.get('/students/:studentId/progress-comparison', async (req, res) => {
   const { studentId } = req.params;
 
@@ -603,20 +638,48 @@ app.get('/students/:studentId/progress-comparison', async (req, res) => {
           : null;
 
       const weeklyStatForYear = weeklyStats.find((ws) => ws.anio === goal.anio);
-
       const pesoObjetivo = parseFloat(goal.peso_objetivo);
       const pesoActual = lastProgress ? parseFloat(lastProgress.peso_kg) : null;
 
+      const tipoObjetivo = detectarTipoObjetivo(goal.objetivo || '');
       let diferenciaPeso = null;
       let cumplioObjetivoPeso = null;
       let pesoRestanteParaObjetivo = null;
-
-      if (pesoActual !== null) {
+      let estadoObjetivo = goal.estado;
+      if (pesoActual !== null && pesoObjetivo !== null) {
         diferenciaPeso = parseFloat((pesoActual - pesoObjetivo).toFixed(2));
-        cumplioObjetivoPeso = pesoActual <= pesoObjetivo - 3;
-        pesoRestanteParaObjetivo = cumplioObjetivoPeso
-          ? 0
-          : parseFloat((pesoActual - (pesoObjetivo - 3)).toFixed(2));
+
+        if (tipoObjetivo === 'BAJAR_PESO') {
+          cumplioObjetivoPeso = pesoActual <= pesoObjetivo + 3;
+          pesoRestanteParaObjetivo = cumplioObjetivoPeso
+            ? 0
+            : parseFloat((pesoActual - (pesoObjetivo + 3)).toFixed(2));
+        } else if (tipoObjetivo === 'SUBIR_PESO') {
+          cumplioObjetivoPeso = pesoActual >= pesoObjetivo;
+          pesoRestanteParaObjetivo = cumplioObjetivoPeso
+            ? 0
+            : parseFloat((pesoObjetivo - pesoActual).toFixed(2));
+        } else if (tipoObjetivo === 'MANTENER_PESO') {
+          cumplioObjetivoPeso = Math.abs(diferenciaPeso) <= 1;
+          pesoRestanteParaObjetivo = cumplioObjetivoPeso
+            ? 0
+            : Math.abs(diferenciaPeso);
+        } else if (
+          ['TONIFICAR', 'FUERZA', 'BIENESTAR', 'OTRO_ESTILO', 'OTROS'].includes(
+            tipoObjetivo
+          )
+        ) {
+          // Estos objetivos no se enfocan en el peso como principal métrica.
+          cumplioObjetivoPeso = null;
+          pesoRestanteParaObjetivo = null;
+        }
+
+        estadoObjetivo =
+          cumplioObjetivoPeso === null
+            ? 'NO_EVALUA_PESO'
+            : cumplioObjetivoPeso
+            ? 'COMPLETADO'
+            : 'EN_PROGRESO';
       }
 
       return {
@@ -624,13 +687,13 @@ app.get('/students/:studentId/progress-comparison', async (req, res) => {
         mes: goal.mes,
         anio: goal.anio,
         objetivo: goal.objetivo,
-        estadoObjetivo: goal.estado,
+        tipoObjetivo,
+        estadoObjetivo,
         pesoObjetivo: goal.peso_objetivo,
         alturaObjetivo: goal.altura_objetivo,
         grasaObjetivo: goal.grasa_objetivo,
         cinturaObjetivo: goal.cintura_objetivo,
 
-        // Aquí agregamos TODOS los progresos del mes
         progresosDelMes: progresosDelMes.map((prog) => ({
           fecha: prog.fecha,
           peso: prog.peso_kg,
