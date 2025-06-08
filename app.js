@@ -569,36 +569,41 @@ function detectarTipoObjetivo(objetivoTexto) {
 
 app.get('/students/:studentId/progress-comparison', async (req, res) => {
   const { studentId } = req.params;
+  const { mes, anio } = req.query; // <-- Aceptamos mes y anio por query
 
   try {
     // 1. Obtener objetivos mensuales (igual que antes)
+    // 1. Objetivos mensuales filtrados si se pasa mes y anio
     const [monthlyGoals] = await pool.query(
       `SELECT 
-         id, mes, anio, objetivo,
-         peso_kg AS peso_objetivo,
-         altura_cm AS altura_objetivo,
-         grasa_corporal AS grasa_objetivo,
-         cintura_cm AS cintura_objetivo,
-         estado, created_at, updated_at
-       FROM student_monthly_goals
-       WHERE student_id = ?
-       ORDER BY anio DESC, mes DESC`,
-      [studentId]
+           id, mes, anio, objetivo,
+           peso_kg AS peso_objetivo,
+           altura_cm AS altura_objetivo,
+           grasa_corporal AS grasa_objetivo,
+           cintura_cm AS cintura_objetivo,
+           estado, created_at, updated_at
+         FROM student_monthly_goals
+         WHERE student_id = ?
+         ${mes && anio ? 'AND mes = ? AND anio = ?' : ''}
+         ORDER BY anio DESC, mes DESC`,
+      mes && anio ? [studentId, mes, anio] : [studentId]
     );
 
     // 2. Obtener progresos reales (igual que antes)
+    // 2. Progresos reales (filtramos también si hay mes y anio)
     const [progresses] = await pool.query(
       `SELECT 
-         id, student_id,
-         DATE_FORMAT(fecha, '%Y-%m') AS anio_mes,
-         MONTH(fecha) AS mes,
-         YEAR(fecha) AS anio,
-         peso_kg, altura_cm, grasa_corporal, cintura_cm,
-         comentario, fecha, created_at, updated_at
-       FROM student_progress
-       WHERE student_id = ?
-       ORDER BY fecha DESC`,
-      [studentId]
+           id, student_id,
+           DATE_FORMAT(fecha, '%Y-%m') AS anio_mes,
+           MONTH(fecha) AS mes,
+           YEAR(fecha) AS anio,
+           peso_kg, altura_cm, grasa_corporal, cintura_cm,
+           comentario, fecha, created_at, updated_at
+         FROM student_progress
+         WHERE student_id = ?
+         ${mes && anio ? 'AND MONTH(fecha) = ? AND YEAR(fecha) = ?' : ''}
+         ORDER BY fecha DESC`,
+      mes && anio ? [studentId, mes, anio] : [studentId]
     );
 
     // 3. Obtener estadísticas semanales (nuevo)
