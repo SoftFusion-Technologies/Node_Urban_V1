@@ -571,6 +571,7 @@ app.get('/students/:studentId/progress-comparison', async (req, res) => {
         cinturaObjetivo: goal.cintura_objetivo,
 
         progresosDelMes: progresosDelMes.map((prog) => ({
+          id: prog.id,
           fecha: prog.fecha,
           peso: prog.peso_kg,
           altura: prog.altura_cm,
