@@ -37,7 +37,7 @@ const StudentRMModel = db.define(
       allowNull: false
     },
     peso_levantado: {
-      type: DataTypes.DECIMAL(5, 2),
+      type: DataTypes.DECIMAL(6, 2), // soporta hasta 9999.99
       allowNull: false
     },
     repeticiones: {
