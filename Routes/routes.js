@@ -38,7 +38,8 @@ import {
   UR_Routines_CTS,
   DL_RoutineExercisesByMuscle_CTS,
   DL_UpdateMuscleName_CTS,
-  UR_CompletarRutina_CTS
+  UR_CompletarRutina_CTS,
+  OBRS_RoutinesByInstructor_CTS
 } from '../Controllers/CTS_TB_Routines.js';
 
 import {
@@ -227,6 +228,9 @@ router.put('/routines/:routineId/muscle/:oldMuscle', DL_UpdateMuscleName_CTS);
 
 // Ruta para completar una rutina
 router.put('/routines/:id/completar', UR_CompletarRutina_CTS);
+
+router.get('/routines-by-instructor', OBRS_RoutinesByInstructor_CTS);
+
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------

@@ -176,3 +176,37 @@ export const UR_CompletarRutina_CTS = async (req, res) => {
     return res.status(500).json({ mensajeError: error.message });
   }
 };
+import UserModel from '../Models/MD_TB_Users.js'; // Asegurate de importar tu modelo de usuario
+
+export const OBRS_RoutinesByInstructor_CTS = async (req, res) => {
+  try {
+    const { instructor_id } = req.query;
+
+    if (!instructor_id) {
+      return res.status(400).json({ mensajeError: 'Instructor ID requerido' });
+    }
+
+    const rutinas = await RoutinesModel.findAll({
+      where: { instructor_id },
+      include: [
+        {
+          model: RoutineExercisesModel,
+          as: 'exercises'
+        },
+        {
+          model: UserModel,
+          as: 'alumno', // Asegurate de usar el alias definido en la asociación
+          attributes: ['id', 'name'] // O `nomyape` si así se llama en tu modelo
+        }
+      ],
+      order: [['fecha', 'DESC']]
+    });
+
+    res.json(rutinas);
+  } catch (error) {
+    console.error('Error al obtener rutinas por instructor:', error);
+    res
+      .status(500)
+      .json({ mensajeError: 'Error al obtener rutinas por instructor' });
+  }
+};
