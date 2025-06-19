@@ -143,8 +143,20 @@ import {
   UR_MealItems_CTS,
   ER_MealItems_CTS
 } from '../Controllers/Diets/CTS_TB_MealItems.js';
-
 // NUEVO MODULO DE DIETAS
+
+// NUEVO MODULO DE GESTION DE RM
+import {
+  OBR_StudentRM_CTS,
+  OBRS_StudentRM_CTS,
+  CR_StudentRM_CTS,
+  ER_StudentRM_CTS,
+  UR_StudentRM_CTS,
+  OBRS_HistorialRM_CTS
+} from '../Controllers/CTS_TB_StudentRM.js';
+// NUEVO MODULO DE GESTION DE RM
+
+
 
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
@@ -393,5 +405,24 @@ router.post('/meal_items', CR_MealItems_CTS);
 router.put('/meal_items/:id', UR_MealItems_CTS);
 router.delete('/meal_items/:id', ER_MealItems_CTS);
 // NUEVO MODULO DE DIETAS
+
+// ----------------------------------------------------------------
+// Obtener todos los registros de RM (opcionalmente filtrar por student_id)
+router.get('/student-rm', OBRS_StudentRM_CTS);
+
+// Obtener un registro de RM por ID
+router.get('/student-rm/:id', OBR_StudentRM_CTS);
+
+// Crear un nuevo registro de RM
+router.post('/student-rm', CR_StudentRM_CTS);
+
+// Eliminar un registro de RM por ID
+router.delete('/student-rm/:id', ER_StudentRM_CTS);
+
+// Actualizar un registro de RM por ID
+router.put('/student-rm/:id', UR_StudentRM_CTS);
+
+router.get('/rm-historial', OBRS_HistorialRM_CTS); // http://localhost:8080/rm-historial?student_id=18&ejercicio=Sentadilla
+
 // Exporta el enrutador
 export default router;
