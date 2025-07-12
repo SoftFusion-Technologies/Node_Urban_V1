@@ -21,6 +21,9 @@ import mysql from 'mysql2/promise'; // Usar mysql2 para las promesas
 import DietsModel from './Models/Diets/MD_TB_Diets.js';
 import MealsModel from './Models/Diets/MD_TB_Meals.js';
 import MealItemsModel from './Models/Diets/MD_TB_MealItems.js';
+
+import './Models/associations.js';
+
 // CONFIGURACION PRODUCCION
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();

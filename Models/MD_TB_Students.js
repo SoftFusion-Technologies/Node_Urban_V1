@@ -48,6 +48,12 @@ const StudentsModel = db.define(
       type: DataTypes.TEXT,
       allowNull: true
     },
+    rutina_tipo: {
+      type: DataTypes.ENUM('personalizado', 'general'),
+      allowNull: false,
+      defaultValue: 'personalizado'
+    },
+
     created_at: {
       type: DataTypes.DATE,
       allowNull: true

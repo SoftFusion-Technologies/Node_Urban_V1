@@ -72,12 +72,4 @@ const UsersModel = db.define(
   }
 );
 
-// Definición de la relación: un usuario puede tener muchos alumnos
-UsersModel.hasMany(StudentsModel, { foreignKey: 'user_id', as: 'students' });
-UsersModel.hasMany(RoutinesModel, {
-  foreignKey: 'instructor_id',
-  as: 'routines'
-});
-
-
 export default UsersModel;

@@ -60,14 +60,5 @@ const RoutinesModel = db.define(
   }
 );
 
-RoutinesModel.hasMany(RoutineExercisesModel, {
-  foreignKey: 'routine_id',
-  as: 'exercises' // alias para incluir ejercicios en la consulta
-});
-
-RoutineExercisesModel.belongsTo(RoutinesModel, {
-  foreignKey: 'routine_id',
-  as: 'routine'
-});
 
 export default RoutinesModel;

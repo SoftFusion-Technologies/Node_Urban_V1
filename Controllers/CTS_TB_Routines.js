@@ -195,7 +195,7 @@ export const OBRS_RoutinesByInstructor_CTS = async (req, res) => {
         },
         {
           model: UserModel,
-          as: 'alumno', // Asegurate de usar el alias definido en la asociación
+          as: 'instructor', // Asegurate de usar el alias definido en la asociación
           attributes: ['id', 'name'] // O `nomyape` si así se llama en tu modelo
         }
       ],
