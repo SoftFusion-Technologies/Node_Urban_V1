@@ -1,16 +1,13 @@
 /*
  * Programador: Benjamin Orellana
  * Fecha Creación: 23 /05 / 2025
- * Fecha Actualizacion 1 : 31 /05 / 2025 se agrega campo desde y hasta
- * Versión: 1.1
+ * Fecha Actualizacion 2 : 08 /08 / 2025 se agregan campos series, repeticiones, tiempo, descanso
+ * Versión: 1.2
  *
  * Descripción:
- * Este archivo (MD_TB_RoutineExercises.js) contiene la definición del modelo Sequelize para la tabla routine_exercises.
- * Tema: Modelos - RoutineExercises
- * Capa: Backend
+ * Definición del modelo Sequelize para la tabla routine_exercises con nuevos campos para series, repeticiones, tiempo y descanso.
  */
 
-// Importa la configuración de la base de datos y tipos de datos necesarios
 import dotenv from 'dotenv';
 import db from '../DataBase/db.js';
 import { DataTypes } from 'sequelize';
@@ -38,6 +35,23 @@ const RoutineExercisesModel = db.define(
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: null
+    },
+    // Nuevos campos
+    series: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    repeticiones: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    tiempo: {
+      type: DataTypes.STRING(20),
+      allowNull: true
+    },
+    descanso: {
+      type: DataTypes.STRING(20),
+      allowNull: true
     },
     desde: {
       type: DataTypes.DATEONLY,

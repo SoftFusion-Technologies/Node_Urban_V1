@@ -157,7 +157,13 @@ import {
 } from '../Controllers/CTS_TB_StudentRM.js';
 // NUEVO MODULO DE GESTION DE RM
 
-
+import {
+  OBRS_RoutineExerciseLogs_CTS, // Obtener todos los logs o filtrar
+  OBR_RoutineExerciseLog_CTS, // Obtener un log por id
+  CR_RoutineExerciseLog_CTS, // Crear un nuevo log
+  ER_RoutineExerciseLog_CTS, // Eliminar un log
+  UR_RoutineExerciseLog_CTS // Actualizar un log
+} from '../Controllers/CTS_TB_RoutineExerciseLogs.js';
 
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
@@ -427,6 +433,22 @@ router.delete('/student-rm/:id', ER_StudentRM_CTS);
 router.put('/student-rm/:id', UR_StudentRM_CTS);
 
 router.get('/rm-historial', OBRS_HistorialRM_CTS); // http://localhost:8080/rm-historial?student_id=18&ejercicio=Sentadilla
+
+// ----------------------------------------------------------------
+// Obtener todos los logs o filtrar por alumno y/o ejercicio
+router.get('/routine_exercise_logs', OBRS_RoutineExerciseLogs_CTS);
+
+// Obtener un log por id
+router.get('/routine_exercise_logs/:id', OBR_RoutineExerciseLog_CTS);
+
+// Crear un nuevo log (registro de peso)
+router.post('/routine_exercise_logs', CR_RoutineExerciseLog_CTS);
+
+// Eliminar un log por id
+router.delete('/routine_exercise_logs/:logId', ER_RoutineExerciseLog_CTS);
+
+// Actualizar un log por id (opcional, si permitís edición)
+router.put('/routine_exercise_logs/:logId', UR_RoutineExerciseLog_CTS);
 
 // Exporta el enrutador
 export default router;
