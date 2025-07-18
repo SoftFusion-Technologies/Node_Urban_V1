@@ -11,6 +11,7 @@
 import dotenv from 'dotenv';
 import db from '../DataBase/db.js';
 import { DataTypes } from 'sequelize';
+import RutinaColoresModel from './MD_TB_RutinaColores.js';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
@@ -74,5 +75,10 @@ const RoutineExercisesModel = db.define(
     timestamps: false
   }
 );
+
+RoutineExercisesModel.belongsTo(RutinaColoresModel, {
+  foreignKey: 'color_id',
+  as: 'color'
+});
 
 export default RoutineExercisesModel;

@@ -165,6 +165,14 @@ import {
   UR_RoutineExerciseLog_CTS // Actualizar un log
 } from '../Controllers/CTS_TB_RoutineExerciseLogs.js';
 
+import {
+  OBRS_RutinaColores_CTS,
+  OBR_RutinaColor_CTS,
+  CR_RutinaColor_CTS,
+  UR_RutinaColor_CTS,
+  ER_RutinaColor_CTS
+} from '../Controllers/CTS_TB_RutinaColores.js';
+
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -449,6 +457,12 @@ router.delete('/routine_exercise_logs/:logId', ER_RoutineExerciseLog_CTS);
 
 // Actualizar un log por id (opcional, si permitís edición)
 router.put('/routine_exercise_logs/:logId', UR_RoutineExerciseLog_CTS);
+
+router.get('/rutina-colores', OBRS_RutinaColores_CTS);
+router.get('/rutina-colores/:id', OBR_RutinaColor_CTS);
+router.post('/rutina-colores', CR_RutinaColor_CTS);
+router.put('/rutina-colores/:id', UR_RutinaColor_CTS);
+router.delete('/rutina-colores/:id', ER_RutinaColor_CTS);
 
 // Exporta el enrutador
 export default router;

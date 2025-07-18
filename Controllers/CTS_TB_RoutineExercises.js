@@ -10,14 +10,21 @@
  */
 
 import RoutineExercisesModel from '../Models/MD_TB_RoutineExercises.js';
+import RutinaColoresModel from '../Models/MD_TB_RutinaColores.js';
 
-// Obtener todos los ejercicios o filtrar por routine_id
 export const OBRS_RoutineExercises_CTS = async (req, res) => {
   try {
     const { routine_id } = req.query;
     const whereClause = routine_id ? { routine_id } : {};
     const registros = await RoutineExercisesModel.findAll({
-      where: whereClause
+      where: whereClause,
+      include: [
+        {
+          model: RutinaColoresModel,
+          as: 'color', // El alias que pusiste arriba
+          attributes: ['id', 'nombre', 'color_hex', 'descripcion']
+        }
+      ]
     });
     res.json(registros);
   } catch (error) {
@@ -26,10 +33,17 @@ export const OBRS_RoutineExercises_CTS = async (req, res) => {
   }
 };
 
-// Obtener un ejercicio por su ID
 export const OBR_RoutineExercises_CTS = async (req, res) => {
   try {
-    const registro = await RoutineExercisesModel.findByPk(req.params.id);
+    const registro = await RoutineExercisesModel.findByPk(req.params.id, {
+      include: [
+        {
+          model: RutinaColoresModel,
+          as: 'color',
+          attributes: ['id', 'nombre', 'color_hex', 'descripcion']
+        }
+      ]
+    });
     if (!registro) {
       return res.status(404).json({ mensajeError: 'Ejercicio no encontrado' });
     }
