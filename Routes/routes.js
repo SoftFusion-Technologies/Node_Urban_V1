@@ -173,6 +173,14 @@ import {
   ER_RutinaColor_CTS
 } from '../Controllers/CTS_TB_RutinaColores.js';
 
+import {
+  OBRS_EjerciciosProfesor_CTS, // Listar/buscar todos (GET)
+  OBR_EjercicioProfesor_CTS, // Traer uno por ID (GET)
+  CR_EjercicioProfesor_CTS, // Crear (POST)
+  UR_EjercicioProfesor_CTS, // Editar (PUT)
+  ER_EjercicioProfesor_CTS // Eliminar (DELETE)
+} from '../Controllers/CTS_TB_EjerciciosProfesor.js';
+
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -463,6 +471,21 @@ router.get('/rutina-colores/:id', OBR_RutinaColor_CTS);
 router.post('/rutina-colores', CR_RutinaColor_CTS);
 router.put('/rutina-colores/:id', UR_RutinaColor_CTS);
 router.delete('/rutina-colores/:id', ER_RutinaColor_CTS);
+
+// Buscar/listar ejercicios de un profesor (con filtro opcional)
+router.get('/ejercicios-profes', OBRS_EjerciciosProfesor_CTS);
+
+// Obtener uno por ID
+router.get('/ejercicios-profes/:id', OBR_EjercicioProfesor_CTS);
+
+// Crear nuevo
+router.post('/ejercicios-profes', CR_EjercicioProfesor_CTS);
+
+// Actualizar nombre de un ejercicio
+router.put('/ejercicios-profes/:id', UR_EjercicioProfesor_CTS);
+
+// Eliminar un ejercicio
+router.delete('/ejercicios-profes/:id', ER_EjercicioProfesor_CTS);
 
 // Exporta el enrutador
 export default router;
