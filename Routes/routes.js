@@ -162,7 +162,10 @@ import {
   OBR_RoutineExerciseLog_CTS, // Obtener un log por id
   CR_RoutineExerciseLog_CTS, // Crear un nuevo log
   ER_RoutineExerciseLog_CTS, // Eliminar un log
-  UR_RoutineExerciseLog_CTS // Actualizar un log
+  UR_RoutineExerciseLog_CTS, // Actualizar un log
+  OBR_LastRoutineExerciseLog_CTS,
+  OBRS_ExercisesWithLastLog_CTS,
+  OBR_HistoryRoutineExerciseLogs_CTS
 } from '../Controllers/CTS_TB_RoutineExerciseLogs.js';
 
 import {
@@ -454,6 +457,14 @@ router.get('/rm-historial', OBRS_HistorialRM_CTS); // http://localhost:8080/rm-h
 // Obtener todos los logs o filtrar por alumno y/o ejercicio
 router.get('/routine_exercise_logs', OBRS_RoutineExerciseLogs_CTS);
 
+// 👉 Esta línea debe ir antes que la de :id
+// GET /routine_exercise_logs/last?student_id=XX&routine_exercise_id=YY
+router.get('/routine_exercise_logs/last', OBR_LastRoutineExerciseLog_CTS);
+
+router.get(
+  '/routine_exercise_logs/history',
+  OBR_HistoryRoutineExerciseLogs_CTS
+);
 // Obtener un log por id
 router.get('/routine_exercise_logs/:id', OBR_RoutineExerciseLog_CTS);
 
@@ -465,6 +476,9 @@ router.delete('/routine_exercise_logs/:logId', ER_RoutineExerciseLog_CTS);
 
 // Actualizar un log por id (opcional, si permitís edición)
 router.put('/routine_exercise_logs/:logId', UR_RoutineExerciseLog_CTS);
+
+// GET /routine_exercises/with_last_log?routine_id=XX&student_id=YY
+router.get('/routine_exercises/with_last_log', OBRS_ExercisesWithLastLog_CTS);
 
 router.get('/rutina-colores', OBRS_RutinaColores_CTS);
 router.get('/rutina-colores/:id', OBR_RutinaColor_CTS);
