@@ -13,7 +13,7 @@
 import dotenv from 'dotenv';
 import db from '../DataBase/db.js';
 import { DataTypes } from 'sequelize';
-
+import UsersModel from './MD_TB_Users.js';
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
@@ -47,4 +47,8 @@ const EjerciciosProfesorModel = db.define(
   }
 );
 
+EjerciciosProfesorModel.belongsTo(UsersModel, {
+  foreignKey: 'profesor_id',
+  as: 'profesor'
+});
 export default EjerciciosProfesorModel;

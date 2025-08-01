@@ -11,26 +11,33 @@
  */
 
 import EjerciciosProfesorModel from '../Models/MD_TB_EjerciciosProfesor.js';
-
+import UsersModel from '../Models/MD_TB_Users.js';
 // Obtener todos los ejercicios de un profesor, opcionalmente filtrando por nombre
 export const OBRS_EjerciciosProfesor_CTS = async (req, res) => {
   try {
     const { profesor_id, filtro } = req.query;
 
-    if (!profesor_id) {
-      return res.status(400).json({ mensajeError: 'profesor_id requerido' });
+    const where = {};
+
+    // Filtrado opcional por profesor
+    if (profesor_id) {
+      where.profesor_id = profesor_id;
     }
 
-    const where = {
-      profesor_id
-    };
-
+    // Filtrado opcional por nombre
     if (filtro && filtro.trim()) {
-      where.nombre = { $like: `%${filtro.trim()}%` };
+      where.nombre = { [Op.like]: `%${filtro.trim()}%` };
     }
 
     const ejercicios = await EjerciciosProfesorModel.findAll({
       where,
+      include: [
+        {
+          model: UsersModel,
+          as: 'profesor',
+          attributes: ['id', 'name'] // O agregá 'email' si querés más info
+        }
+      ],
       order: [['nombre', 'ASC']]
     });
 
@@ -44,15 +51,26 @@ export const OBRS_EjerciciosProfesor_CTS = async (req, res) => {
 // Obtener un ejercicio por ID
 export const OBR_EjercicioProfesor_CTS = async (req, res) => {
   try {
-    const ejercicio = await EjerciciosProfesorModel.findByPk(req.params.id);
+    const ejercicio = await EjerciciosProfesorModel.findByPk(req.params.id, {
+      include: [
+        {
+          model: UsersModel,
+          as: 'profesor',
+          attributes: ['id', 'name']
+        }
+      ]
+    });
+
     if (!ejercicio) {
       return res.status(404).json({ mensajeError: 'Ejercicio no encontrado' });
     }
+
     res.json(ejercicio);
   } catch (error) {
     res.status(500).json({ mensajeError: error.message });
   }
 };
+
 
 // Crear un nuevo ejercicio (evita duplicados por profesor_id + nombre)
 export const CR_EjercicioProfesor_CTS = async (req, res) => {

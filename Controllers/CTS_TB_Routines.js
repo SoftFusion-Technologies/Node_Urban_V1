@@ -53,6 +53,8 @@ export const OBR_Routines_CTS = async (req, res) => {
 
 export const CR_Routines_CTS = async (req, res) => {
   try {
+    console.log('BODY recibido en /routines:', req.body);
+
     const registro = await RoutinesModel.create(req.body);
     res.json({
       message: 'Rutina creada correctamente',
@@ -112,12 +114,10 @@ export const DL_RoutineExercisesByMuscle_CTS = async (req, res) => {
         message: `Ejercicios del músculo "${musculo}" eliminados correctamente.`
       });
     } else {
-      return res
-        .status(404)
-        .json({
-          mensajeError:
-            'No se encontraron ejercicios con ese músculo en la rutina.'
-        });
+      return res.status(404).json({
+        mensajeError:
+          'No se encontraron ejercicios con ese músculo en la rutina.'
+      });
     }
   } catch (error) {
     return res.status(500).json({ mensajeError: error.message });

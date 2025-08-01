@@ -184,6 +184,13 @@ import {
   ER_EjercicioProfesor_CTS // Eliminar (DELETE)
 } from '../Controllers/CTS_TB_EjerciciosProfesor.js';
 
+import {
+  OBRS_BloquesEjercicio_CTS,
+  OBR_BloqueEjercicio_CTS,
+  CR_BloqueEjercicio_CTS,
+  UR_BloqueEjercicio_CTS,
+  ER_BloqueEjercicio_CTS
+} from '../Controllers/CTS_TB_BloquesEjercicio.js';
 // ----------------------------------------------------------------
 // Crea un enrutador de Express
 const router = express.Router();
@@ -501,5 +508,13 @@ router.put('/ejercicios-profes/:id', UR_EjercicioProfesor_CTS);
 // Eliminar un ejercicio
 router.delete('/ejercicios-profes/:id', ER_EjercicioProfesor_CTS);
 
+router.get(
+  '/ejercicios-profes/:ejercicio_id/bloques',
+  OBRS_BloquesEjercicio_CTS
+);
+router.get('/bloques-ejercicio/:id', OBR_BloqueEjercicio_CTS);
+router.post('/ejercicios-profes/:ejercicio_id/bloques', CR_BloqueEjercicio_CTS);
+router.put('/bloques-ejercicio/:id', UR_BloqueEjercicio_CTS);
+router.delete('/bloques-ejercicio/:id', ER_BloqueEjercicio_CTS);
 // Exporta el enrutador
 export default router;
