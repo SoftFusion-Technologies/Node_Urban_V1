@@ -23,6 +23,7 @@ import MealsModel from './Models/Diets/MD_TB_Meals.js';
 import MealItemsModel from './Models/Diets/MD_TB_MealItems.js';
 
 import './Models/associations.js';
+import './Models/Rutinas_V2/relaciones.js';
 
 // CONFIGURACION PRODUCCION
 if (process.env.NODE_ENV !== 'production') {

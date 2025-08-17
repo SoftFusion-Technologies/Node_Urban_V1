@@ -1,11 +1,11 @@
 /*
  * Programador: Benjamin Orellana
- * Fecha Creación: 08 /08 / 2025
- * Versión: 1.0
+ * Fecha Creación: 08/08/2025
+ * Versión: 1.1
  *
  * Descripción:
  * Definición del modelo Sequelize para la tabla routine_exercise_logs.
- * Relaciona un ejercicio de rutina, un alumno, fecha, peso, y observaciones.
+ * Ahora referencia SERIES (serie_id) en lugar de routine_exercises.
  */
 
 import dotenv from 'dotenv';
@@ -19,7 +19,7 @@ if (process.env.NODE_ENV !== 'production') {
 const RoutineExerciseLogsModel = db.define(
   'routine_exercise_logs',
   {
-    routine_exercise_id: {
+    serie_id: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false
     },
@@ -32,25 +32,17 @@ const RoutineExerciseLogsModel = db.define(
       allowNull: false
     },
     peso: {
-      type: DataTypes.DECIMAL(5, 2),
+      type: DataTypes.DECIMAL(5, 2), // podés subir a (6,2) si querés
       allowNull: true
     },
     observaciones: {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: true
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: true
-    }
+    created_at: { type: DataTypes.DATE, allowNull: true },
+    updated_at: { type: DataTypes.DATE, allowNull: true }
   },
-  {
-    timestamps: false
-  }
+  { timestamps: false }
 );
 
 export default RoutineExerciseLogsModel;
